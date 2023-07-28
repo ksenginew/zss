@@ -9,43 +9,28 @@ let stringify = (/** @type {{ [x: string]: any; }} */ data) => {
     return out
 };
 
-export let toHash = (/** @type {string} */ str) => {
+let ID = 'zs'
+let toHash = (/** @type {string} */ str) => {
     let i = 0,
         out = 11;
     while (i < str.length) out = (101 * out + str.charCodeAt(i++)) >>> 0;
-    return '_' + out;
+    return ID + out;
 };
+
 
 export let setup = (options = {}) => {
     /** @type {Record<string, string>} */
     let cache = {}
-    /**@type {CSSStyleSheet | string[]} */
-    let sheet;
-    /** @type {(rule: string, index?: number) => any} */
-    let update;
-    let extract;
+    let sheet = new CSSStyleSheet()
+    document.adoptedStyleSheets.push(sheet)
 
-    if (typeof window === 'object') {
-        sheet = new CSSStyleSheet()
-        document.adoptedStyleSheets.push(sheet)
-        // @ts-ignore
-        update = (/** @type {string} */ rule, index) => sheet.insertRule(rule, index)
-        // @ts-ignore
-        extract = () => [...sheet.cssRules].map(rule => rule.cssText).join('')
-
-    } else {
-        /** @type {string[]} */
-        sheet = []
-        // @ts-ignore
-        update = (/** @type {string} */ rule, index = sheet.length) => sheet.splice(index, 0, rule)
-        // @ts-ignore
-        extract = () => sheet.join('')
-    }
-
-    let style = (/** @type {{ [x: string]: any; }} */ styles) => {
+    let style = (/** @type {number | undefined} */ type, /** @type {{ [x: string]: any; }} */ styles) => {
         let css = stringify(styles);
-        console.log(css)
 
+        if (type == 1) {
+            sheet.insertRule(css, 0)
+            return
+        }
         let className =
             cache[css] || (cache[css] = toHash(css));
 
@@ -54,7 +39,10 @@ export let setup = (options = {}) => {
             cache[className] = css
 
             // add or update
-            let pos = update('.' + className + '{' + css + '}')
+            if (type == 2)
+                sheet.insertRule('@keyframes ' + className + '{' + css + '}')
+            else
+                sheet.insertRule('.' + className + '{' + css + '}')
         }
 
         // return hash
@@ -63,9 +51,14 @@ export let setup = (options = {}) => {
 
 
     return {
-        /** @param {{ [x: string]: any; }} styles*/
-        css(styles) { return style(styles) },
-        extract, sheet
+        css: style,
+        // @ts-ignore
+        global: style.bind(null, 1),
+        // @ts-ignore
+        keyframes: style.bind(null, 2),
+        extract() {
+            return [...sheet.cssRules].map(rule => rule.cssText).join('')
+        }, sheet
     }
 }
 

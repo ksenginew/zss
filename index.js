@@ -1,11 +1,11 @@
-import { css ,extract} from "./zss.js";
+import { css } from "./zss.js";
 
 const HeaderClass = css({
   background: 'dodgerblue',
   color: 'white',
   padding: '1em'
 })
-console.log(extract())
+// @ts-ignore
 document.getElementById("app").innerHTML = `
 <h1 class="${HeaderClass}">Hello Vanilla!</h1>
 <div>

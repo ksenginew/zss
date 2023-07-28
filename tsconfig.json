@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "target": "ES2015",
-      "module": "commonjs",
+      "module": "ESNext",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
@@ -9,7 +9,9 @@
       "checkJs": true,
       "allowJs": true,
       "emitDeclarationOnly": true,
-      "declaration": true
+      "declaration": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true
     },
-    "$schema": "https://json.schemastore.org/tsconfig",
+    "$schema": "https://json.schemastore.org/tsconfig"
   }
